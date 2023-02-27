@@ -75,12 +75,8 @@ components:
           description: Last list change time, in ISO 8601.
           example: 2023-02-26T13:12:20Z
         updated-by:
-          type: object
-          description: The user that last modified this list.
           $ref: '#/components/schemas/User'        
         owner:
-          type: object
-          description: The user that owns this list and can add users to it.
           $ref: '#/components/schemas/User'
         users:
           type: array
@@ -124,8 +120,6 @@ components:
           description: Last list change time, in ISO 8601.
           example: 2023-02-26T13:12:20Z
         updated-by:
-          type: object
-          description: The user that last touched this element.
           $ref: '#/components/schemas/User'
 
     Message:
@@ -187,8 +181,6 @@ paths:
                     example: b122b959-9516-49b1-9b0b-0680786ae73c
                     description: The Bearer Token you can use to identify with from now on
                   user:
-                    type: object
-                    description: The user you just authenticated as
                     $ref: '#/components/schemas/User'
         '403':
           description: Given user does not exist, or password is wrong.
