@@ -83,6 +83,11 @@ components:
           description: A list of users that have access to this list.
           items: 
             $ref: '#/components/schemas/User'
+        priorities:
+          type: array
+          description: A list of priorities defined for this list.
+          items:
+            $ref: '#/components/schemas/Priority'
 
     List:
       allOf:
@@ -112,6 +117,8 @@ components:
           type: string
           description: Human readable name for this element.
           example: Eggs
+        priority:
+          $ref: '#/components/schemas/Priority'
         checked:
           type: boolean
           description: Is this element checked or not?
@@ -121,6 +128,28 @@ components:
           example: 2023-02-26T13:12:20Z
         updated-by:
           $ref: '#/components/schemas/User'
+
+    Priority:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: uint64
+          description: Unique identifier for this priority.
+          example: 841
+        name:
+          type: string
+          description: The name if this priority level.
+          example: When on sale
+        list:
+          type: integer
+          format: uint64
+          description: Identifier of the list this priority is in.
+          example: 83
+        weight:
+          type: integer
+          description: The value to sort this priority by.
+          example: 1
 
     Message:
       type: object
@@ -143,6 +172,12 @@ components:
   responses:
     '401':
       description: You failed to set the HTTP Authentication header, or it is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '422':
+      description: The request makes no sense, such as adding an element to a list with a priority that belongs to a different list.
       content:
         application/json:
           schema:
@@ -270,7 +305,7 @@ paths:
           schema:
             type: integer
             format: uint64
-            minimum: 1
+            example: 83
       responses:
         '200':
           description: List was found and you have access.
@@ -303,7 +338,7 @@ paths:
           schema:
             type: integer
             format: uint64
-            minimum: 1
+            example: 83
       responses:
         '200':
           description: List was updated
@@ -362,14 +397,14 @@ paths:
           schema:
             type: integer
             format: uint64
-            minimum: 1
+            example: 83
 
   /elements/:
     get:
       summary: Get a list of previously used element names.
       description: |
         Obtain a list of previously used element names in lists you have access to.  
-        This includes all Element names, *from all Lists* that the requesting user has access to.  
+        This includes all Element names, *from all Lists* that the requesting user has access to, but no further details.  
         The suggested use for this is auto-completing list entries when creating them.
       responses:
         '200':
@@ -390,6 +425,27 @@ paths:
         Create a new element and return it.  
         Freshly created elements will already have an updated timestamp and update-by user on them, for
         simplicity of handling the return, even if they have not technically been updated yet.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Human-friendly display name for this list element.
+                  example: Eggs
+                list:
+                  type: integer
+                  format: uint64
+                  description: ID of the list to put this element in.
+                  example: 83
+                priority:
+                  type: integer
+                  format: uint64
+                  description: ID of the priority to give the newly created element.
+                  example: 841
       responses:
         '201':
           description: The newly created element.
@@ -399,6 +455,9 @@ paths:
                 $ref: '#/components/schemas/Element'
         '401':
           $ref: '#/components/responses/401'
+        '422':
+          $ref: '#/components/responses/422'
+
   
   /elements/{id}:
     get:
@@ -415,7 +474,7 @@ paths:
           schema:
             type: integer
             format: uint64
-            minimum: 1
+            example: 33
       responses:
         '200':
           description: 'Element details'
@@ -450,7 +509,7 @@ paths:
           schema:
             type: integer
             format: uint64
-            minimum: 1
+            example: 33
       requestBody:
         required: true
         content:
@@ -465,6 +524,12 @@ paths:
                 checked:
                   type: boolean
                   description: Is this element checked or not?
+                  example: false
+                priority:
+                  type: integer
+                  format: uint64
+                  description: ID of the priority level you want this element to have.
+                  example: 7
       responses:
         '200':
           description: 'The updated Element details'
@@ -480,6 +545,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/422'
     delete:
       summary: Permanently delete a list element.
       description: |
@@ -506,4 +573,166 @@ paths:
           schema:
             type: integer
             format: uint64
-            minimum: 1
+            example: 841
+  
+  /priorities/:
+    get:
+      summary: Get a list of priority names in lists you have access to.
+      description: |
+        Obtain a list of previously used priority names in lists you have access to.  
+        This includes all Priority names, *from all Lists* that the requesting user has access to, but no further details.  
+        The suggested use for this is auto-completing priority names when creating a new Priority.
+      responses:
+        '200':
+          description: The list of previously used priority names.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                example: ['Essential', 'On payday', 'When on sale']
+        '401':
+          $ref: '#/components/responses/401'
+    post:
+      summary: Create a new priority
+      description: '#TODO: Elaborate on priority creation.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Human-friendly display name for this priority level.
+                  example: When on sale
+                list:
+                  type: integer
+                  format: uint64
+                  description: ID of the list to put this priority level in.
+                  example: 83
+                weight:
+                  type: integer
+                  description: The initial weight of this priority.
+                  example: 1
+      responses:
+        '201':
+          description: The newly created priority.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Priority'
+        '401':
+          $ref: '#/components/responses/401'
+        '422':
+          $ref: '#/components/responses/422'
+
+  /priorities/{id}:
+    get:
+      summary: Get the full details of a given priority level.
+      description: |
+        Get the details of a specific priority level.  
+        It is presumed that the action of obtaining a single priority level is a relatively rare occurance.  
+        The recommended way to implement is to request the whole list and cache the data in the client.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The unique ID of the priority level to request details for.
+          schema:
+            type: integer
+            format: uint64
+            example: 841
+      responses:
+        '200':
+          description: 'Priority level details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Priority'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          description: Element does not exist, or you do not have access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      summary: Update the name and/or wegith of a priority level.
+      description: |
+        Update the particulars of a specific priority level.  
+        Note that only the name and weight is actually accepted as data.  
+        You **can not** set the `list` field. This is instead accomplished by creating the priority level in the
+        other list, and then deleting it here. It cannot be transferred.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The unique ID of the priority level to update.
+          schema:
+            type: integer
+            format: uint64
+            example: 841
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Human readable name for this priority level.
+                  example: When on Sale
+                weight:
+                  type: integer
+                  format: uint64
+                  description: ID of the priority level you want this element to have.
+                  example: 1
+      responses:
+        '200':
+          description: 'The updated Priority details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Priority'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          description: Priority does not exist, or you do not have access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/422'
+    delete:
+      summary: Permanently delete a Priority level.
+      description: |
+        Permanently remove an element from the list it is in.  
+        No functionality is provided for verifying or undoing this action. The priority level is completely
+        removed and is entirely unrecoverable.
+        **It is on the client to verify that this is what the user actually wants to do.**
+      responses:
+        '204':
+          description: The Priority was deleted. Note that the response has no data.
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          description: The Priority does not exist, or does not belong to a list you have access to.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The unique ID of the priority to permanently delete.
+          schema:
+            type: integer
+            format: uint64
+            example: 841
