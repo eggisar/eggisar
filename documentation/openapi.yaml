@@ -23,6 +23,9 @@ servers:
     description: Production
   - url: staging-eggisar.kaffekod.nu/api/v0
     description: Staging
+tags:
+  - name: "default"
+    description: "Set of interaction methods for Eggisar backend"
 security: 
   -  BearerAuth: []
 
@@ -169,6 +172,21 @@ components:
               description: Does this error imply that the used authentication is no longer valid?
               example: false
 
+    Event:
+      type: object
+      properties:
+        subject:
+          type: string
+          enum: [list, element, priority]
+        action:
+          type: string
+          enum: [create, update, delete]
+        data:
+          oneOf:
+            - $ref: '#/components/schemas/ListHeader'
+            - $ref: '#/components/schemas/Element'
+            - $ref: '#/components/schemas/Priority'
+
   responses:
     '401':
       description: You failed to set the HTTP Authentication header, or it is invalid.
@@ -236,12 +254,26 @@ paths:
 
   /events:
     get:
-      summary: Event source for updated list headers.
+      summary: Event source for when someone else interacts with things you might be displaying.
       description: |
-        #TODO: **This section is woefully incomplete**
+        I can't figure out the "proper" way to do an event source in OpenAPI.  
+        There is an issue about it on the OpenAPI github, [issue #396](https://github.com/OAI/OpenAPI-Specification/issues/396),
+        but it is basically closed without resolution.
 
-        A lot more work is left to do on this section to properly specify how events should be handled.
+        It is way out of scope for this project to come up with The Official Way OpenAPI should implement this,
+        and quite frankly I don't have any idea what would be a good way to do it.
+
+        This is intended to be consumed as an [EventSource](https://developer.mozilla.org/en-US/docs/Web/API/EventSource)
+
+        #TODO: There might be a need for additional clearification in the future. We'll see how the official eggisar implementation goes.
+        
       responses:
+        '200':
+          description: Request was successful. You will be receiving events here.
+          content:
+            text/event-stream:
+              schema:
+                  $ref: '#/components/schemas/Event'
         '401':
           $ref: '#/components/responses/401'
 
