@@ -595,8 +595,10 @@ paths:
         '401':
           $ref: '#/components/responses/401'
     post:
-      summary: Create a new priority
-      description: '#TODO: Elaborate on priority creation.'
+      summary: Create and return a new priority
+      description: |
+        Create a new priority level and return it.  
+        The only thing added to the priority level that was not specified when creating it is the ID.
       requestBody:
         required: true
         content:
