@@ -1,20 +1,15 @@
 openapi: 3.0.1
 info:
-  version: 0.0.0
+  version: 1.0.0
   title: eggisar list interaction API
   description: |
-    **Initial Draft version - Do not implement!**
-
     This is the API specification for communication between the eggisar shopping list application and it's server backend.
 
     Note that this is written documentation-first and no actual code to respond to any requests exists as of yet.  
     Some sections, most notably the /events path, is very poorly defined.
 
-    Another notable point that needs a lot more work is the granting and revocation of user access.
-
-    Also, a lot of work remains to be done on what properties are and are not required.
-
-    **Initial Draft version - Do not implement!**
+    Another notable point that needs a lot more work is the granting and revocation of user access.  
+    That is out-of-scope for the API at this time.
   license: 
     name: MIT License
     url: https://github.com/eggisar/eggisar/blob/main/LICENSE
