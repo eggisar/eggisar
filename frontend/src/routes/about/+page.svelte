@@ -3,6 +3,7 @@
 </script>
 
 <!-- elements -->
+about
 
 <style>
 
