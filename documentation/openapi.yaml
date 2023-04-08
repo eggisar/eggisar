@@ -68,6 +68,10 @@ components:
           type: string
           description: Human-friendly display name for this list.
           example: Groceries
+        note:
+          type: string
+          description: A note associated with the list.
+          example: Bob-Harry is allergic to nuts!
         updated:
           type: string
           description: Last list change time, in ISO 8601.
