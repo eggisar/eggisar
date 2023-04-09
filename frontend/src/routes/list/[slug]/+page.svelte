@@ -27,9 +27,13 @@
 
 <Header title={listName} />
 <main>
-    {#each items as item}
-    <ListElement itemName={item.name} updateTime={item.updated} />
-    {/each}
+    {#if items.length > 0}
+        {#each items as item}
+            <ListElement itemName={item.name} updateTime={item.updated} />
+        {/each}
+    {:else} 
+        <p>This list is empty.</p>
+    {/if}
 </main>
 
 <style>
