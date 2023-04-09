@@ -1,0 +1,771 @@
+openapi: 3.0.1
+info:
+  version: 1.0.0
+  title: eggisar list interaction API
+  description: |
+    This is the API specification for communication between the eggisar shopping list application and it's server backend.
+
+    Note that this is written documentation-first and no actual code to respond to any requests exists as of yet.  
+    Some sections, most notably the /events path, is very poorly defined.
+
+    Another notable point that needs a lot more work is the granting and revocation of user access.  
+    That is out-of-scope for the API at this time.
+  license: 
+    name: MIT License
+    url: https://github.com/eggisar/eggisar/blob/main/LICENSE
+servers: 
+  - url: eggisar.kaffekod.nu/api/v0
+    description: Production
+  - url: staging-eggisar.kaffekod.nu/api/v0
+    description: Staging
+tags:
+  - name: "default"
+    description: "Set of interaction methods for Eggisar backend"
+security: 
+  -  BearerAuth: []
+
+components:
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+
+  schemas:
+
+    User:
+      description: An eggisar user with full user details.
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier ID for this user.
+          format: uint64
+          example: 89347
+        name:
+          type: string
+          description: Human-friendly display name for this user.
+          example: Mikachu
+        email:
+          type: string
+          description: The email address associated with this user.
+          example: mika@example.com
+        color:
+          type: string
+          description: Hexadecimal RGB color that represents this user.
+          example: '#33AA33'
+
+    ListHeader:
+      description: The same as a list, but without the elements
+      type: object
+      properties:
+        id:
+          type: integer
+          format: uint64
+          description: Unique identifier for this list.
+          example: 83
+        name:
+          type: string
+          description: Human-friendly display name for this list.
+          example: Groceries
+        note:
+          type: string
+          description: A note associated with the list.
+          example: Bob-Harry is allergic to nuts!
+        updated:
+          type: string
+          description: Last list change time, in ISO 8601.
+          example: 2023-02-26T13:12:20Z
+        updated-by:
+          $ref: '#/components/schemas/User'        
+        owner:
+          $ref: '#/components/schemas/User'
+        users:
+          type: array
+          description: A list of users that have access to this list.
+          items: 
+            $ref: '#/components/schemas/User'
+        priorities:
+          type: array
+          description: A list of priorities defined for this list.
+          items:
+            $ref: '#/components/schemas/Priority'
+
+    List:
+      allOf:
+        - $ref: '#/components/schemas/ListHeader'
+        - type: object
+          properties:
+            elements:
+              type: array
+              description: A list of elements in this list.
+              items:
+                $ref: '#/components/schemas/Element'
+
+    Element:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: uint64
+          description: Unique identifier for this element.
+          example: 33
+        list:
+          type: integer
+          format: uint64
+          description: Identifier of the list this element is in.
+          example: 83
+        name:
+          type: string
+          description: Human readable name for this element.
+          example: Eggs
+        priority:
+          $ref: '#/components/schemas/Priority'
+        checked:
+          type: boolean
+          description: Is this element checked or not?
+        updated:
+          type: string
+          description: Last list change time, in ISO 8601.
+          example: 2023-02-26T13:12:20Z
+        updated-by:
+          $ref: '#/components/schemas/User'
+
+    Priority:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: uint64
+          description: Unique identifier for this priority.
+          example: 841
+        name:
+          type: string
+          description: The name if this priority level.
+          example: When on sale
+        list:
+          type: integer
+          format: uint64
+          description: Identifier of the list this priority is in.
+          example: 83
+        weight:
+          type: integer
+          description: The value to sort this priority by.
+          example: 1
+
+    Message:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Human readable message.
+          example: Human readable message of what actually happened.
+
+    Error:
+      allOf:
+        - $ref: '#/components/schemas/Message'
+        - type: object
+          properties:
+            voidAuth:
+              type: boolean
+              description: Does this error imply that the used authentication is no longer valid?
+              example: false
+
+    Event:
+      type: object
+      properties:
+        subject:
+          type: string
+          enum: [list, element, priority]
+        action:
+          type: string
+          enum: [create, update, delete]
+        data:
+          oneOf:
+            - $ref: '#/components/schemas/ListHeader'
+            - $ref: '#/components/schemas/Element'
+            - $ref: '#/components/schemas/Priority'
+
+  responses:
+    '401':
+      description: You failed to set the HTTP Authentication header, or it is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '422':
+      description: The request makes no sense, such as adding an element to a list with a priority that belongs to a different list.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+paths:
+  /auth:
+    post:
+      summary: Authenticate yourself with the service and obtain a bearer token for subsequent requests.
+      description: |
+        The given email address and password are checked against the stored credentials of a user.  
+        In an effort to limit timing attacks, and slow down brute force attacks, **a pseudo-random time is added to the response**, even if authentication is successful.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: eggisar@example.com
+                password:
+                  type: string
+                  example: hunter2
+      responses:
+        '200':
+          description: Authentication successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: b122b959-9516-49b1-9b0b-0680786ae73c
+                    description: The Bearer Token you can use to identify with from now on
+                  user:
+                    $ref: '#/components/schemas/User'
+        '403':
+          description: Given user does not exist, or password is wrong.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Discard the used bearer token, effectively logging out.
+      description: |
+        The bearer token used to authenticate the request will be voided, and can no longer be used.  
+        This effectively logs out the current user, and denies all future requests, until a new authentication is done.
+      responses:
+        '204':
+          description: Your bearer token was successfully voided. Note that the response will have no data.
+        '401':
+          $ref: '#/components/responses/401'
+
+  /events:
+    get:
+      summary: Event source for when someone else interacts with things you might be displaying.
+      description: |
+        I can't figure out the "proper" way to do an event source in OpenAPI.  
+        There is an issue about it on the OpenAPI github, [issue #396](https://github.com/OAI/OpenAPI-Specification/issues/396),
+        but it is basically closed without resolution.
+
+        It is way out of scope for this project to come up with The Official Way OpenAPI should implement this,
+        and quite frankly I don't have any idea what would be a good way to do it.
+
+        This is intended to be consumed as an [EventSource](https://developer.mozilla.org/en-US/docs/Web/API/EventSource)
+
+        #TODO: There might be a need for additional clearification in the future. We'll see how the official eggisar implementation goes.
+        
+      responses:
+        '200':
+          description: Request was successful. You will be receiving events here.
+          content:
+            text/event-stream:
+              schema:
+                  $ref: '#/components/schemas/Event'
+        '401':
+          $ref: '#/components/responses/401'
+
+  /lists:
+    get:
+      summary: Get an array of the lists you have access to.
+      description: |
+        Gets a complete list of all Lists the user has access to, both owned and access-granted ones.  
+        Note that the returned list of Lists does not contain the actual list elements, but only the list *headers*.
+
+        Another request must be made to obtain the actual list elements.
+      responses:
+        '200':
+          description: An array of lists you have access to.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ListHeader'
+        '401':
+          $ref: '#/components/responses/401'
+    post:
+      summary: Create and return a new list.
+      description: |
+        A new list will be created, and the list headers returned.  
+        Note that specifying users with access to the list is *not* supported at creation-time.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Groceries
+      responses:
+        '201':
+          description: List was successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListHeader'
+        '401':
+          $ref: '#/components/responses/401'
+                           
+  /lists/{id}:
+    get:
+      summary: Get a specific list, including all it's elements.
+      description: |
+        Returns details on a specific list, populated with elements.  
+        This includes the full list headers.
+
+        **Pagination is not supported at this time!**
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The unique ID of the list to request details for.
+          schema:
+            type: integer
+            format: uint64
+            example: 83
+      responses:
+        '200':
+          description: List was found and you have access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/List'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          description: List does not exist, or you do not have access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      summary: Change the name or access for a specific list.
+      description: |
+        Update an existing list to give it a new name or update it's access list.
+
+        - You can omit the access list if you do not wish to update it.
+        - You *must* give a **complete** access list, including everyone that were already authorized, as it will
+          override the currently stored value. This is to allow for the removal of users in the same operation.
+        - You can omit the name if you do not wish to change it.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The unique ID of the list to update details for.
+          schema:
+            type: integer
+            format: uint64
+            example: 83
+      responses:
+        '200':
+          description: List was updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListHeader'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          description: List does not exist, or does not belong to you.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Human-friendly display name for this list.
+                  example: Groceries
+                users:
+                  type: array
+                  description: A list of users that have access to this list.
+                  items: 
+                    type: integer
+                    format: uint64
+                    example: 89347
+    delete:
+      summary: Permanently remove a list and all it's elements.
+      description: |
+        This will permanently remove a list, including all elements on the list, with no further verification and
+        no way to roll back the change.  
+        **It is on the client to verify that this is what the user actually wants to do.**
+      responses:
+        '204':
+          description: List was deleted. Note that the response has no data.
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          description: List does not exist, or you do not have access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The unique ID of the list to permanently delete.
+          schema:
+            type: integer
+            format: uint64
+            example: 83
+
+  /elements/:
+    get:
+      summary: Get a list of previously used element names.
+      description: |
+        Obtain a list of previously used element names in lists you have access to.  
+        This includes all Element names, *from all Lists* that the requesting user has access to, but no further details.  
+        The suggested use for this is auto-completing list entries when creating them.
+      responses:
+        '200':
+          description: The list of previously used element names.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                example: ['Eggs', 'Milk', 'Bananas']
+        '401':
+          $ref: '#/components/responses/401'
+
+    post:
+      summary: Create and return a new element
+      description: |
+        Create a new element and return it.  
+        Freshly created elements will already have an updated timestamp and update-by user on them, for
+        simplicity of handling the return, even if they have not technically been updated yet.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Human-friendly display name for this list element.
+                  example: Eggs
+                list:
+                  type: integer
+                  format: uint64
+                  description: ID of the list to put this element in.
+                  example: 83
+                priority:
+                  type: integer
+                  format: uint64
+                  description: ID of the priority to give the newly created element.
+                  example: 841
+      responses:
+        '201':
+          description: The newly created element.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Element'
+        '401':
+          $ref: '#/components/responses/401'
+        '422':
+          $ref: '#/components/responses/422'
+
+  
+  /elements/{id}:
+    get:
+      summary: Get the full details of a given list element.
+      description: |
+        Get the details of a specific list element.  
+        It is presumed that the action of obtaining a single element is a relatively rare occurance.  
+        The recommended way to implement is to request the whole list and cache the data in the client.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The unique ID of the element to request details for.
+          schema:
+            type: integer
+            format: uint64
+            example: 33
+      responses:
+        '200':
+          description: 'Element details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Element'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          description: Element does not exist, or you do not have access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    patch:
+      summary: Update the name and/or checked status of a list element.
+      description: |
+        Update the particulars of a specific list element.  
+        Note that only the name and wether or not it is checked is actually accepted as data.  
+        You **can not** set the `updated` and `updated-by` fields, for example. These are automatically updated
+        based on when the element is updated, and by whom it is changed.
+
+        Also of note is that you **can not** update what list the element belongs to. This is accomplished by
+        creating the element in the other list, and then deleting it here. It cannot be transferred.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The unique ID of the element to update.
+          schema:
+            type: integer
+            format: uint64
+            example: 33
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Human readable name for this element.
+                  example: Eggs
+                checked:
+                  type: boolean
+                  description: Is this element checked or not?
+                  example: false
+                priority:
+                  type: integer
+                  format: uint64
+                  description: ID of the priority level you want this element to have.
+                  example: 7
+      responses:
+        '200':
+          description: 'The updated Element details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Element'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          description: Element does not exist, or you do not have access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/422'
+    delete:
+      summary: Permanently delete a list element.
+      description: |
+        Permanently remove an element from the list it is in.  
+        No functionality is provided for verifying or undoing this action. The element is completely removed
+        and is entirely unrecoverable.
+        **It is on the client to verify that this is what the user actually wants to do.**
+      responses:
+        '204':
+          description: Element was deleted. Note that the response has no data.
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          description: The Element does not exist, or does not belong to a list you have access to.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The unique ID of the list to permanently delete.
+          schema:
+            type: integer
+            format: uint64
+            example: 841
+  
+  /priorities/:
+    get:
+      summary: Get a list of priority names in lists you have access to.
+      description: |
+        Obtain a list of previously used priority names in lists you have access to.  
+        This includes all Priority names, *from all Lists* that the requesting user has access to, but no further details.  
+        The suggested use for this is auto-completing priority names when creating a new Priority.
+      responses:
+        '200':
+          description: The list of previously used priority names.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                example: ['Essential', 'On payday', 'When on sale']
+        '401':
+          $ref: '#/components/responses/401'
+    post:
+      summary: Create and return a new priority
+      description: |
+        Create a new priority level and return it.  
+        The only thing added to the priority level that was not specified when creating it is the ID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Human-friendly display name for this priority level.
+                  example: When on sale
+                list:
+                  type: integer
+                  format: uint64
+                  description: ID of the list to put this priority level in.
+                  example: 83
+                weight:
+                  type: integer
+                  description: The initial weight of this priority.
+                  example: 1
+      responses:
+        '201':
+          description: The newly created priority.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Priority'
+        '401':
+          $ref: '#/components/responses/401'
+        '422':
+          $ref: '#/components/responses/422'
+
+  /priorities/{id}:
+    get:
+      summary: Get the full details of a given priority level.
+      description: |
+        Get the details of a specific priority level.  
+        It is presumed that the action of obtaining a single priority level is a relatively rare occurance.  
+        The recommended way to implement is to request the whole list and cache the data in the client.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The unique ID of the priority level to request details for.
+          schema:
+            type: integer
+            format: uint64
+            example: 841
+      responses:
+        '200':
+          description: 'Priority level details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Priority'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          description: Element does not exist, or you do not have access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      summary: Update the name and/or wegith of a priority level.
+      description: |
+        Update the particulars of a specific priority level.  
+        Note that only the name and weight is actually accepted as data.  
+        You **can not** set the `list` field. This is instead accomplished by creating the priority level in the
+        other list, and then deleting it here. It cannot be transferred.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The unique ID of the priority level to update.
+          schema:
+            type: integer
+            format: uint64
+            example: 841
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Human readable name for this priority level.
+                  example: When on Sale
+                weight:
+                  type: integer
+                  format: uint64
+                  description: ID of the priority level you want this element to have.
+                  example: 1
+      responses:
+        '200':
+          description: 'The updated Priority details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Priority'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          description: Priority does not exist, or you do not have access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/422'
+    delete:
+      summary: Permanently delete a Priority level.
+      description: |
+        Permanently remove an element from the list it is in.  
+        No functionality is provided for verifying or undoing this action. The priority level is completely
+        removed and is entirely unrecoverable.
+        **It is on the client to verify that this is what the user actually wants to do.**
+      responses:
+        '204':
+          description: The Priority was deleted. Note that the response has no data.
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          description: The Priority does not exist, or does not belong to a list you have access to.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The unique ID of the priority to permanently delete.
+          schema:
+            type: integer
+            format: uint64
+            example: 841
