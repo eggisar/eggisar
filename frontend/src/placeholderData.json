@@ -1,0 +1,458 @@
+{
+    "user": [
+        {
+            "id": 0,
+            "name":	"Monica",
+            "email": "monica@eggisar.se",
+            "color": "orange"
+        },{
+            "id": 1,
+            "name":	"Fredrik",
+            "email": "fredrik@eggisar.se",
+            "color": "purple"
+        },{
+            "id": 2,
+            "name":	"Marvin",
+            "email": "marvin@eggisar.se",
+            "color": "yellow"
+        }
+    ],
+    "listHeader": [
+        {
+            "id": 0,
+            "name": "Groceries",
+            "updated": "2023-04-07T11:52:31Z",
+            "updated-by": {
+                "id": 1,
+                "name":	"Fredrik",
+                "email": "fredrik@eggisar.se",
+                "color": "purple"
+            },
+            "owner": {
+                "id": 1,
+                "name":	"Fredrik",
+                "email": "fredrik@eggisar.se",
+                "color": "purple"
+            },
+            "users": [
+                {
+                    "id": 0,
+                    "name":	"Monica",
+                    "email": "monica@eggisar.se",
+                    "color": "orange"
+                },{
+                    "id": 2,
+                    "name":	"Marvin",
+                    "email": "marvin@eggisar.se",
+                    "color": "yellow"
+                }
+            ],
+            "priorities": [],
+            "elements": []
+        },{
+            "id": 1,
+            "name": "Eggbread",
+            "updated": "2023-04-07T11:52:31Z",
+            "updated-by": {
+                "id": 1,
+                "name":	"Fredrik",
+                "email": "fredrik@eggisar.se",
+                "color": "purple"
+            },
+            "owner": {
+                "id": 1,
+                "name":	"Fredrik",
+                "email": "fredrik@eggisar.se",
+                "color": "purple"
+            },
+            "users": [
+                {
+                    "id": 0,
+                    "name":	"Monica",
+                    "email": "monica@eggisar.se",
+                    "color": "orange"
+                },{
+                    "id": 2,
+                    "name":	"Marvin",
+                    "email": "marvin@eggisar.se",
+                    "color": "yellow"
+                }
+            ],
+            "priorities": [
+                {
+                    "id": 0,
+                    "name": "Behövs nu",
+                    "list": 0,
+                    "weight": 1
+                },{
+                    "id": 1,
+                    "name": "Om det finns plats kvar",
+                    "list": 0,
+                    "weight": 2
+                },{
+                    "id": 2,
+                    "name": "På extrapris",
+                    "list": 0,
+                    "weight": 3
+                }
+            ]
+        }
+    ],
+    "list": [
+        {
+            "id": 0,
+            "name": "Groceries",
+            "updated": "2023-04-07T11:52:31Z",
+            "updated-by": {
+                "id": 1,
+                "name":	"Fredrik",
+                "email": "fredrik@eggisar.se",
+                "color": "purple"
+            },
+            "owner": {
+                "id": 1,
+                "name":	"Fredrik",
+                "email": "fredrik@eggisar.se",
+                "color": "purple"
+            },
+            "users": [
+                {
+                    "id": 0,
+                    "name":	"Monica",
+                    "email": "monica@eggisar.se",
+                    "color": "orange"
+                },{
+                    "id": 2,
+                    "name":	"Marvin",
+                    "email": "marvin@eggisar.se",
+                    "color": "yellow"
+                }
+            ],
+            "priorities": [
+                {
+                    "id": 0,
+                    "name": "Behövs nu",
+                    "list": 0,
+                    "weight": 1
+                },{
+                    "id": 1,
+                    "name": "Om det finns plats kvar",
+                    "list": 0,
+                    "weight": 2
+                },{
+                    "id": 2,
+                    "name": "På extrapris",
+                    "list": 0,
+                    "weight": 3
+                }
+            ],
+            "elements": [
+                {
+                    "id": 0,
+                    "list": 0,
+                    "name": "Ägg",
+                    "priority": {
+                        "id": 0,
+                        "name": "Behövs nu",
+                        "list": 0,
+                        "weight": 1
+                    },
+                    "checked": false,
+                    "updated": "2023-04-05T14:52:31Z",
+                    "updated-by": {
+                        "id": 0,
+                        "name":	"Monica",
+                        "email": "monica@eggisar.se",
+                        "color": "orange"
+                    }
+                },{
+                    "id": 1,
+                    "list": 0,
+                    "name": "Sprit",
+                    "priority": {
+                        "id": 0,
+                        "name": "Behövs nu",
+                        "list": 0,
+                        "weight": 1
+                    },
+                    "checked": false,
+                    "updated": "2023-04-07T11:52:31Z",
+                    "updated-by": {
+                        "id": 2,
+                        "name":	"Marvin",
+                        "email": "marvin@eggisar.se",
+                        "color": "yellow"
+                    }
+                },{
+                    "id": 2,
+                    "list": 0,
+                    "name": "Mjöl",
+                    "priority": {
+                        "id": 0,
+                        "name": "Behövs nu",
+                        "list": 0,
+                        "weight": 1
+                    },
+                    "checked": false,
+                    "updated": "2023-04-05T14:58:31Z",
+                    "updated-by": {
+                        "id": 0,
+                        "name":	"Monica",
+                        "email": "monica@eggisar.se",
+                        "color": "orange"
+                    }
+                },{
+                    "id": 3,
+                    "list": 0,
+                    "name": "Mjölk",
+                    "priority": {
+                        "id": 1,
+                        "name": "Om det finns plats kvar",
+                        "list": 0,
+                        "weight": 2
+                    },
+                    "checked": false,
+                    "updated": "2023-04-02T18:16:31Z",
+                    "updated-by": {
+                        "id": 1,
+                        "name":	"Fredrik",
+                        "email": "fredrik@eggisar.se",
+                        "color": "purple"
+                    }
+                },{
+                    "id": 4,
+                    "list": 0,
+                    "name": "Kaffe",
+                    "priority": {
+                        "id": 1,
+                        "name": "Om det finns plats kvar",
+                        "list": 0,
+                        "weight": 2
+                    },
+                    "checked": false,
+                    "updated": "2023-04-02T18:14:31Z",
+                    "updated-by": {
+                        "id": 0,
+                        "name":	"Monica",
+                        "email": "monica@eggisar.se",
+                        "color": "orange"
+                    }
+                },{
+                    "id": 5,
+                    "list": 0,
+                    "name": "Choklad",
+                    "priority": {
+                        "id": 2,
+                        "name": "På extrapris",
+                        "list": 0,
+                        "weight": 3
+                    },
+                    "checked": false,
+                    "updated": "2023-04-02T10:51:31Z",
+                    "updated-by": {
+                        "id": 1,
+                        "name":	"Fredrik",
+                        "email": "fredrik@eggisar.se",
+                        "color": "purple"
+                    }
+                },{
+                    "id": 6,
+                    "list": 0,
+                    "name": "Banan",
+                    "priority": {
+                        "id": 2,
+                        "name": "På extrapris",
+                        "list": 0,
+                        "weight": 3
+                    },
+                    "checked": false,
+                    "updated": "2023-03-02T08:21:31Z",
+                    "updated-by": {
+                        "id": 1,
+                        "name":	"Fredrik",
+                        "email": "fredrik@eggisar.se",
+                        "color": "purple"
+                    }
+                }
+            ]
+        },{
+            "id": 1,
+            "name": "Eggbread",
+            "updated": "2023-04-07T11:52:31Z",
+            "updated-by": {
+                "id": 1,
+                "name":	"Fredrik",
+                "email": "fredrik@eggisar.se",
+                "color": "purple"
+            },
+            "owner": {
+                "id": 1,
+                "name":	"Fredrik",
+                "email": "fredrik@eggisar.se",
+                "color": "purple"
+            },
+            "users": [
+                {
+                    "id": 0,
+                    "name":	"Monica",
+                    "email": "monica@eggisar.se",
+                    "color": "orange"
+                },{
+                    "id": 2,
+                    "name":	"Marvin",
+                    "email": "marvin@eggisar.se",
+                    "color": "yellow"
+                }
+            ],
+            "priorities": [],
+            "elements": []
+        }
+    ],
+    "elements": [
+        {
+            "id": 0,
+            "list": 0,
+            "name": "Ägg",
+            "priority": {
+                "id": 0,
+                "name": "Behövs nu",
+                "list": 0,
+                "weight": 1
+            },
+            "checked": false,
+            "updated": "2023-04-05T14:52:31Z",
+            "updated-by": {
+                "id": 0,
+                "name":	"Monica",
+                "email": "monica@eggisar.se",
+                "color": "orange"
+            }
+        },{
+            "id": 1,
+            "list": 0,
+            "name": "Sprit",
+            "priority": {
+                "id": 0,
+                "name": "Behövs nu",
+                "list": 0,
+                "weight": 1
+            },
+            "checked": false,
+            "updated": "2023-04-07T11:52:31Z",
+            "updated-by": {
+                "id": 2,
+                "name":	"Marvin",
+                "email": "marvin@eggisar.se",
+                "color": "yellow"
+            }
+        },{
+            "id": 2,
+            "list": 0,
+            "name": "Mjöl",
+            "priority": {
+                "id": 0,
+                "name": "Behövs nu",
+                "list": 0,
+                "weight": 1
+            },
+            "checked": false,
+            "updated": "2023-04-05T14:58:31Z",
+            "updated-by": {
+                "id": 0,
+                "name":	"Monica",
+                "email": "monica@eggisar.se",
+                "color": "orange"
+            }
+        },{
+            "id": 3,
+            "list": 0,
+            "name": "Mjölk",
+            "priority": {
+                "id": 1,
+                "name": "Om det finns plats kvar",
+                "list": 0,
+                "weight": 2
+            },
+            "checked": false,
+            "updated": "2023-04-02T18:16:31Z",
+            "updated-by": {
+                "id": 1,
+                "name":	"Fredrik",
+                "email": "fredrik@eggisar.se",
+                "color": "purple"
+            }
+        },{
+            "id": 4,
+            "list": 0,
+            "name": "Kaffe",
+            "priority": {
+                "id": 1,
+                "name": "Om det finns plats kvar",
+                "list": 0,
+                "weight": 2
+            },
+            "checked": false,
+            "updated": "2023-04-02T18:14:31Z",
+            "updated-by": {
+                "id": 0,
+                "name":	"Monica",
+                "email": "monica@eggisar.se",
+                "color": "orange"
+            }
+        },{
+            "id": 5,
+            "list": 0,
+            "name": "Choklad",
+            "priority": {
+                "id": 2,
+                "name": "På extrapris",
+                "list": 0,
+                "weight": 3
+            },
+            "checked": false,
+            "updated": "2023-04-02T10:51:31Z",
+            "updated-by": {
+                "id": 1,
+                "name":	"Fredrik",
+                "email": "fredrik@eggisar.se",
+                "color": "purple"
+            }
+        },{
+            "id": 6,
+            "list": 0,
+            "name": "Banan",
+            "priority": {
+                "id": 2,
+                "name": "På extrapris",
+                "list": 0,
+                "weight": 3
+            },
+            "checked": false,
+            "updated": "2023-03-028T08:21:31Z",
+            "updated-by": {
+                "id": 1,
+                "name":	"Fredrik",
+                "email": "fredrik@eggisar.se",
+                "color": "purple"
+            }
+        }
+    ],
+    "priority": [
+        {
+            "id": 0,
+            "name": "Behövs nu",
+            "list": 0,
+            "weight": 1
+        },{
+            "id": 1,
+            "name": "Om det finns plats kvar",
+            "list": 0,
+            "weight": 2
+        },{
+            "id": 2,
+            "name": "På extrapris",
+            "list": 0,
+            "weight": 3
+        }
+    ]
+}
