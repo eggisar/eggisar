@@ -1,16 +1,13 @@
 <script lang="ts">
     import Header from "../../components/Header.svelte";
-    import ListElement from "../../components/ListElement.svelte";
 
-    const listName = "name of list";
+    const listName = "/list";
 
 </script>
 
 <Header title={listName} />
 <main>
-    <ListElement itemName="eggs" />
-    <ListElement itemName="milk" />
-    <ListElement itemName="flour" />
+    <p>Not sure what to do with this page yet.</p>
 </main>
 
 <style>
