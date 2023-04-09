@@ -1,16 +1,13 @@
 <script lang="ts">
+import placeholderData from "../placeholderData.json";
 
 </script>
 
-
 <main>
     <ul class="lists">
-        <li><a href="/list">Best bacon and egg</a></li>
-        <li><a href="/list">Eggbread</a></li>
-        <li><a href="/list">Groceries</a></li>
-        <li><a href="/list">Ikea</a></li>
-        <li><a href="/list">Lidl</a></li>
-        <li><a href="/list">Party</a></li>
+        {#each placeholderData.listHeader as list}
+        <li><a href="/list/{list.id+list.name}">{list.name}</a></li>
+        {/each}
     </ul>
 
     <ul class="navigation">
