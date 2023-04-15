@@ -1,6 +1,6 @@
 <script lang="ts">
-    export let title = "";
-
+    import { headerTitle } from "../stores";
+    
 </script>
 
 <header>
@@ -8,7 +8,7 @@
         <figure><a href="/">🥚</a></figure>
         <br/>
         <br/>
-        <h1>{title}</h1>
+        <h1>{$headerTitle}</h1>
     </div>
 </header>
 

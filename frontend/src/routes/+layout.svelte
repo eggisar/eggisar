@@ -2,8 +2,8 @@
 
 <script lang="ts">
     import Header from "../components/Header.svelte";
-
-
+    import { headerTitle } from "../stores";
+    headerTitle.set("My lists");
 </script>
 
 <Header />

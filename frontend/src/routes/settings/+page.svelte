@@ -1,10 +1,10 @@
 <script lang="ts">
     import { headerTitle } from "../../stores";
-    headerTitle.set("About");
+    headerTitle.set("Settings");
 </script>
 
 <main>
-about
+settings
 </main>
 
 <style>

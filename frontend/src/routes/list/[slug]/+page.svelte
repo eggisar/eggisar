@@ -1,11 +1,11 @@
 <script lang="ts">
-    import Header from "../../../components/Header.svelte";
     import ListElement from "../../../components/ListElement.svelte";
     import {page} from '$app/stores';
     import placeholderData from '../../../placeholderData.json';
-    
+    import Sorting from "../../../components/Sorting.svelte";
+    import { headerTitle } from "../../../stores";
+
     const slug:string = $page.params.slug;
-    let listName = "name of list";
     let items: any[] = [];
     // console.log(slug);
     for(let list of placeholderData.list) {
@@ -15,7 +15,7 @@
 
         if(slug.includes(list.name) && slug.includes(list.id.toString())){
             console.log("It's a match! ");
-            listName = list.name;
+            headerTitle.set(list.name);
             for(let item of list.elements) {
                 items.push(item);
             }
@@ -25,8 +25,10 @@
 
 </script>
 
-<Header title={listName} />
+
 <main>
+    <Sorting />
+
     {#if items.length > 0}
         {#each items as item}
             <ListElement itemName={item.name} updateTime={item.updated} />
@@ -35,6 +37,7 @@
         <p>This list is empty.</p>
     {/if}
 </main>
+
 
 <style>
 
