@@ -5,7 +5,6 @@
 
 </script>
 
-<Header title={listName} />
 <main>
     <p>Not sure what to do with this page yet.</p>
 </main>

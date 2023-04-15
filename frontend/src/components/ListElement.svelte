@@ -36,10 +36,11 @@
 <style lang="scss">
 
     .wrapper {
-        margin: var(--margin-small);
+        margin: var(--margin-small) auto;
         border: 1px solid #fafafa;
         border-radius: calc(var(--baseline)*0.5);
         padding: var(--padding);
+        max-width: 30rem;
 
         display: flex;
         flex-direction: row;
