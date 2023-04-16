@@ -45,4 +45,9 @@
         color: #fafafa;
     }
 
+    :global(.icon) {
+        width: calc(var(--baseline)*1.5);
+        height: calc(var(--baseline)*1.5);
+    }
+
 </style>
